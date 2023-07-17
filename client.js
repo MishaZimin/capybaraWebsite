@@ -230,5 +230,5 @@ ws.onmessage = function(event) {
 
 window.onload = function() {
     loadPostsFromLocalStorage();
-    //clearLocalStorage();
+    clearLocalStorage();
 };
