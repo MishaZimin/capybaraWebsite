@@ -8,62 +8,158 @@ $(document).on("scroll", function () {
     if ($(window).scrollTop() === 0) {
         $("header").removeClass("fixed");
     } else {
-        $("header").attr("class", "fixed");
+        $("header").addClass("fixed");
     }
 });
-
-function savePostToLocalStorage(name, url, messageText) {
-    var posts = JSON.parse(localStorage.getItem('posts')) || [];
-    var post = {
-        name: name,
-        url: url,
-        messageText: messageText
-    };
-    posts.push(post);
-    localStorage.setItem('posts', JSON.stringify(posts));
-}
-
-function loadPostsFromLocalStorage() {
-    var posts = JSON.parse(localStorage.getItem('posts')) || [];
-    var messagesDiv = document.getElementById('messages');
-    messagesDiv.innerHTML = '';
-    posts.forEach(function(post) {
-        var postDiv = document.createElement('div');
-        postDiv.classList.add('img');
-        var img = document.createElement('img');
-        img.title = post.name;
-        img.src = post.url;
-        img.alt = '';
-        var span = document.createElement('span');
-        span.innerText = post.messageText;
-        postDiv.appendChild(img);
-        postDiv.appendChild(span);
-        messagesDiv.prepend(postDiv);
-    });
-}
 
 function sendTelegramMessage(name, url, message) {
     var telegramBotToken = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
     var telegramChatId = '997616670';
+
     var telegramMessage = '\n' + name + ' ' + '\n' + url + ' ' + '\n' + message + '\n';
+
     $.ajax({
         url: 'https://api.telegram.org/bot' + telegramBotToken + '/sendMessage',
         method: 'POST',
         data: {
-        chat_id: telegramChatId,
-        text: telegramMessage
+            chat_id: telegramChatId,
+            text: telegramMessage
         },
         success: function (response) {
-        console.log('Сообщение отправлено в Telegram');
+            console.log('Сообщение отправлено в Telegram');
         },
         error: function (error) {
-        console.log('Ошибка при отправке сообщения в Telegram');
+            console.log('Ошибка при отправке сообщения в Telegram');
         }
     });
 }
 
+function handleLike(button) {
+    var counter = button.nextElementSibling;
+    var count = parseInt(counter.innerText) || 0;
+
+    if (button.classList.contains("liked")) {
+        counter.innerText = count - 1;
+        button.classList.remove("liked");
+        updateLikeCount(button.closest(".img").id, count - 1);
+
+        var postId = button.closest(".img").id;
+        var likedPosts = getLikedPostsFromLocalStorage();
+        var index = likedPosts.indexOf(postId);
+        if (index !== -1) {
+            likedPosts.splice(index, 1);
+            saveLikedPostsToLocalStorage(likedPosts);
+        }
+    } else {
+        // Увеличиваем значение счетчика на 1 и обновляем его
+        counter.innerText = count + 1;
+        button.classList.add("liked");
+        updateLikeCount(button.closest(".img").id, count + 1); // Обновляем значение счетчика лайков в localStorage
+
+        // Сохраняем информацию о нажатии кнопки лайка в localStorage
+        var postId = button.closest(".img").id;
+        var likedPosts = getLikedPostsFromLocalStorage();
+        likedPosts.push(postId);
+        saveLikedPostsToLocalStorage(likedPosts);
+    }
+}
+
+function savePostToLocalStorage(name, url, messageText, timestamp) {
+    var posts = getPostsFromLocalStorage();
+
+    var post = {
+        id: Date.now().toString(), // id поста
+        name: name, // имя автора
+        url: url, // url поста
+        messageText: messageText, // текст сообщения
+        likes: 0, // количество лайков
+        timestamp: timestamp // время публикации поста
+    };
+
+    posts.push(post);
+    savePostsToLocalStorage(posts);
+}
+
+
+function updateLikeCount(postId, count) {
+    var allPosts = getPostsFromLocalStorage();
+    var postToUpdate = findPostById(allPosts, postId);
+  
+    if (postToUpdate) {
+      postToUpdate.likes = count;
+      savePostsToLocalStorage(allPosts);
+    }
+}
+
+function findPostById(posts, postId) {
+    return posts.find(function(post) {
+      return post.id === postId;
+    });
+}
+
+function getPostsFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('posts')) || [];
+}
+
+function savePostsToLocalStorage(posts) {
+    localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+function getLikedPostsFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('likedPosts')) || [];
+}
+
+function saveLikedPostsToLocalStorage(likedPosts) {
+    localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
+}
+
+function loadPostsFromLocalStorage() {
+    var posts = getPostsFromLocalStorage();
+
+    posts.sort(function(a, b) {
+        return a.likes - b.likes;
+    });
+
+    var messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML = '';
+
+    posts.forEach(function(post) {
+        var dateAndTime = formatTime(post.timestamp);
+
+        var postHTML = `
+        <div class="img" id="${post.id}">
+            <img src="${post.url}" alt="">
+            <span class="messageText">${post.messageText}</span>
+            <div class="like-section">
+                <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
+                <span class="like-counter">${post.likes}</span>
+            </div>
+            <div class="post-bottom">
+                <span class="post-name">Переслано от ${post.name}</span>
+                <span class="post-time">${dateAndTime}</span>
+            </div>
+        </div>
+        `;
+
+        messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
+    });
+}
+
+function formatTime(timestamp) {
+    var date = new Date(timestamp * 1000);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+  
+    var formattedDateAndTime = day + '/' + month + ' ' + hours + ':' + minutes;
+  
+    return formattedDateAndTime;
+}
+
 function clearLocalStorage() {
     localStorage.removeItem('posts');
+    localStorage.removeItem('likedPosts');
 }
 
 $('#mess_send').click(function () {
@@ -86,10 +182,10 @@ ws.onmessage = function(event) {
 
     let name, url, messageText;
 
-    // Проверяем наличие поля reply_to_message в сообщении
     if (messageData.reply_to_message) {
         const replyMessage = messageData.reply_to_message;
         const replyText = replyMessage.text;
+        
         const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
         [, name, url, messageText] = replyText.match(regex);
     } else {
@@ -101,16 +197,38 @@ ws.onmessage = function(event) {
     messagesDiv.insertAdjacentHTML('afterbegin', 
     `
     <div class="img">
-        <img title="${name}" src="${url}" alt="">
+        <img src="${url}" alt="">
         <span>${messageText}</span>
+        <div class="like-section">
+            <button class="like-button" onclick="handleLike(this)">&#x2764;</button>
+            <span class="like-counter">0</span>
+        </div>
+        <div class="post-bottom">
+            <span class="post-name">Переслано от ${post.name}</span>
+            
+            <span class="post-time">${formatTime(messageData.date)}</span>
+        </div>
     </div>
     `);
 
-    savePostToLocalStorage(name, url, messageText);
+    savePostToLocalStorage(name, url, messageText, messageData.date);
 };
-  
+
+// function createPostElement(name, url, messageText, date) {
+//     return `
+//         <div class="img">
+//             <img title="${name}" src="${url}" alt="">
+//             <span>${messageText}</span>
+//             <div class="like-section">
+//                 <button class="like-button" onclick="handleLike(this)">&#x2764;</button>
+//                 <span class="like-counter">0</span>
+//             </div>
+//             <div class="post-time">${formatTime(date)}</div>
+//         </div>
+//     `;
+// }
+
 window.onload = function() {
     loadPostsFromLocalStorage();
     //clearLocalStorage();
 };
-  
