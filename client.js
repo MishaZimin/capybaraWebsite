@@ -204,7 +204,7 @@ ws.onmessage = function(event) {
             <span class="like-counter">0</span>
         </div>
         <div class="post-bottom">
-            <span class="post-name">Переслано от ${post.name}</span>
+            <span class="post-name">Переслано от ${name}</span>
             
             <span class="post-time">${formatTime(messageData.date)}</span>
         </div>
@@ -230,5 +230,5 @@ ws.onmessage = function(event) {
 
 window.onload = function() {
     loadPostsFromLocalStorage();
-    clearLocalStorage();
+    //clearLocalStorage();
 };
