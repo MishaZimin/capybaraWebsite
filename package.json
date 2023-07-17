@@ -1,0 +1,17 @@
+{
+    "name": "my-project",
+    "version": "1.0.0",
+    "description": "My Project",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "mongoose": "^6.0.12"
+    }
+  }
+  
+  

@@ -12,6 +12,8 @@ $(document).on("scroll", function () {
     }
 });
 
+
+
 function sendTelegramMessage(name, url, message) {
     var telegramBotToken = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
     var telegramChatId = '997616670';
@@ -157,6 +159,45 @@ function formatTime(timestamp) {
     return formattedDateAndTime;
 }
 
+
+// script.js
+
+function loadPostsFromServer() {
+    $.ajax({
+      url: '/posts',
+      method: 'GET',
+      success: function (response) {
+        response.forEach(function (post) {
+          var dateAndTime = formatTime(post.timestamp);
+  
+          var postHTML = `
+          <div class="img" id="${post.id}">
+              <img src="${post.url}" alt="">
+              <span class="messageText">${post.messageText}</span>
+              <div class="like-section">
+                  <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
+                  <span class="like-counter">${post.likes}</span>
+              </div>
+              <div class="post-bottom">
+                  <span class="post-name">Переслано от ${post.name}</span>
+                  <span class="post-time">${dateAndTime}</span>
+              </div>
+          </div>
+          `;
+  
+          $('#messages').append(postHTML);
+        });
+      },
+      error: function (error) {
+        console.log('Ошибка при загрузке постов:', error);
+      },
+    });
+  }
+  
+  $(document).ready(function () {
+    loadPostsFromServer();
+  });
+
 function clearLocalStorage() {
     localStorage.removeItem('posts');
     localStorage.removeItem('likedPosts');
@@ -227,6 +268,8 @@ ws.onmessage = function(event) {
 //         </div>
 //     `;
 // }
+
+
 
 window.onload = function() {
     loadPostsFromLocalStorage();
