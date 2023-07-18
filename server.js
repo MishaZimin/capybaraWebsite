@@ -1,53 +1,16 @@
-{const TelegramBot = require('node-telegram-bot-api');
-const WebSocket = require('ws');
-const { saveDataToDatabase } = require('./database');
-const express = require('express');
-const mongoose = require('mongoose');
-const axios = require('axios');
 
+// const express = require('express');
+// const mongoose = require('mongoose');
 
 // Замените <connection-string> на вашу строку подключения MongoDB Atlas
-const connectionString = 'mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/';
+//const connectionString = 'mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/';
+{const TelegramBot = require('node-telegram-bot-api');
+const WebSocket = require('ws');
 const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
-
-
-
-// Загрузка данных из базы данных и передача на клиентскую сторону
-const app = express();
-
-const { MongoClient } = require('mongodb');
-
-const uri = 'mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/';
-
-app.get('/clientPosts', async (req, res) => {
-  try {
-    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-    // Подключение к базе данных
-    await client.connect();
-
-    // Выполнение операций с базой данных
-    const db = client.db('mydatabase');
-    const collection = db.collection('posts');
-    const data = await collection.find().toArray();
-
-    // Закрытие соединения с базой данных
-    client.close();
-
-    res.json(data); // Отправка данных на клиентскую сторону в формате JSON
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// app.listen(3000, () => {
-//   console.log('Server started on port 3000');
-// });
-
-
 
 const bot = new TelegramBot(token, { polling: true });
 const wss = new WebSocket.Server({ port: 8080 });
+
 
 wss.on('connection', (ws) => {
   console.log('Установлено новое WebSocket соединение');
@@ -64,19 +27,54 @@ bot.on('message', (msg) => {
   wss.clients.forEach((client) => {
     client.send(messageDataString);
   });
-
-  saveDataToDatabase(messageData); // Сохранение данных в базе данных
-
   bot.sendMessage(msg.chat.id, 'Получено');
-});
+});}
+
+// const app = express();
+// const port = 5050;
+
+// // Создание схемы и модели для коллекции "posts"
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+// });
+
+// const Post = mongoose.model('Post', postSchema);
+
+// // Подключение к MongoDB
+// mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
+//   .then(() => {
+//     console.log('MongoDB connected');
+//     // Запуск веб-сервера после успешного подключения к MongoDB
+//     app.listen(port, () => {
+//       console.log(`Server started on port ${port}`);
+//     });
+//   })
+//   .catch((error) => {
+//     console.error('MongoDB connection error:', error);
+//   });
+
+// // Загрузка данных из базы данных и передача на клиентскую сторону
+// app.get('capybaraWebsite/index.html/local', async (req, res) => {
+//   try {
+//     // Выполнение операции нахождения всех постов в коллекции "posts"
+//     const data = await Post.find().exec();
+//     res.json(data); // Отправка данных на клиентскую сторону в формате JSON
+//   } catch (error) {
+//     console.error('Error retrieving posts:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 
 
-mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => {
-  console.log('MongoDB connected');
-  // Запуск веб-сервера после успешного подключения к MongoDB
-  app.listen(5050, () => {
-    console.log('Server started on port 5050');
-  });
-})}
+
+
+
+
+
+
+
+
+

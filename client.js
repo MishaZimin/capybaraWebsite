@@ -1,3 +1,4 @@
+// client.js
 function slowScroll(id) {
     $("html, body").animate({
         scrollTop: $(id).offset().top
@@ -13,6 +14,43 @@ $(document).on("scroll", function () {
 });
 
 
+// function loadPostsFromServer() {
+//     $.ajax({
+//       url: '/notes',
+//       method: 'GET',
+//       success: function (response) {
+//         var posts = JSON.parse(response);
+//         // Обработка полученных данных
+//         posts.forEach(function(post) {
+//             var dateAndTime = formatTime(post.timestamp);
+    
+//             var postHTML = `
+//             <div class="img" id="${post.id}">
+//                 <img src="${post.url}" alt="">
+//                 <span class="messageText">${post.messageText}</span>
+//                 <div class="like-section">
+//                     <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
+//                     <span class="like-counter">${post.likes}</span>
+//                 </div>
+//                 <div class="post-bottom">
+//                     <span class="post-name">Переслано от ${post.name}</span>
+//                     <span class="post-time">${dateAndTime}</span>
+//                 </div>
+//             </div>
+//             `;
+    
+//             messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
+//         });
+//       },
+//       error: function (error) {
+//         console.log('Ошибка при загрузке постов:', error.statusText);
+//       },
+//     });
+//   }
+  
+//   $(document).ready(function () {
+//     loadPostsFromServer();
+//   });
 
 function sendTelegramMessage(name, url, message) {
     var telegramBotToken = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
@@ -51,6 +89,7 @@ function handleLike(button) {
         if (index !== -1) {
             likedPosts.splice(index, 1);
             saveLikedPostsToLocalStorage(likedPosts);
+            loadPostsFromLocalStorage();
         }
     } else {
         // Увеличиваем значение счетчика на 1 и обновляем его
@@ -63,6 +102,7 @@ function handleLike(button) {
         var likedPosts = getLikedPostsFromLocalStorage();
         likedPosts.push(postId);
         saveLikedPostsToLocalStorage(likedPosts);
+        loadPostsFromLocalStorage();
     }
 }
 
@@ -159,31 +199,6 @@ function formatTime(timestamp) {
     return formattedDateAndTime;
 }
 
-
-// script.js
-
-function loadPostsFromServer() {
-    $.ajax({
-      url: '/clientPosts',
-      method: 'GET',
-      success: function (response) {
-        var posts = JSON.parse(response);
-        // Обработка полученных данных
-        posts.forEach(function (post) {
-          // ...
-        });
-      },
-      error: function (error) {
-        console.log('Ошибка при загрузке постов:', error.statusText);
-      },
-    });
-  }
-  
-  $(document).ready(function () {
-    loadPostsFromServer();
-  });
-  
-
 function clearLocalStorage() {
     localStorage.removeItem('posts');
     localStorage.removeItem('likedPosts');
@@ -217,7 +232,13 @@ ws.onmessage = function(event) {
         [, name, url, messageText] = replyText.match(regex);
     } else {
         const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
-        [, name, url, messageText] = message.match(regex);
+        const matchResult = message.match(regex);
+        if (matchResult) {
+        [, name, url, messageText] = matchResult;
+        // Дальнейший код, использующий name, url и messageText
+        } else {
+        // Обработка случая, когда не удалось получить совпадение
+        }
     }
 
     const messagesDiv = document.getElementById('messages');
@@ -254,8 +275,6 @@ ws.onmessage = function(event) {
 //         </div>
 //     `;
 // }
-
-
 
 window.onload = function() {
     loadPostsFromLocalStorage();
