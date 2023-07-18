@@ -164,32 +164,17 @@ function formatTime(timestamp) {
 
 function loadPostsFromServer() {
     $.ajax({
-      url: '/posts',
+      url: '/clientPosts',
       method: 'GET',
       success: function (response) {
-        response.forEach(function (post) {
-          var dateAndTime = formatTime(post.timestamp);
-  
-          var postHTML = `
-          <div class="img" id="${post.id}">
-              <img src="${post.url}" alt="">
-              <span class="messageText">${post.messageText}</span>
-              <div class="like-section">
-                  <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
-                  <span class="like-counter">${post.likes}</span>
-              </div>
-              <div class="post-bottom">
-                  <span class="post-name">Переслано от ${post.name}</span>
-                  <span class="post-time">${dateAndTime}</span>
-              </div>
-          </div>
-          `;
-  
-          $('#messages').append(postHTML);
+        var posts = JSON.parse(response);
+        // Обработка полученных данных
+        posts.forEach(function (post) {
+          // ...
         });
       },
       error: function (error) {
-        console.log('Ошибка при загрузке постов:', error);
+        console.log('Ошибка при загрузке постов:', error.statusText);
       },
     });
   }
@@ -197,6 +182,7 @@ function loadPostsFromServer() {
   $(document).ready(function () {
     loadPostsFromServer();
   });
+  
 
 function clearLocalStorage() {
     localStorage.removeItem('posts');
