@@ -89,7 +89,7 @@ function handleLike(button) {
         if (index !== -1) {
             likedPosts.splice(index, 1);
             saveLikedPostsToLocalStorage(likedPosts);
-            loadPostsFromLocalStorage();
+            
         }
     } else {
         // Увеличиваем значение счетчика на 1 и обновляем его
@@ -102,8 +102,9 @@ function handleLike(button) {
         var likedPosts = getLikedPostsFromLocalStorage();
         likedPosts.push(postId);
         saveLikedPostsToLocalStorage(likedPosts);
-        loadPostsFromLocalStorage();
+        
     }
+    loadPostsFromLocalStorage();
 }
 
 function savePostToLocalStorage(name, url, messageText, timestamp) {
@@ -170,21 +171,117 @@ function loadPostsFromLocalStorage() {
 
         var postHTML = `
         <div class="img" id="${post.id}">
-            <img src="${post.url}" alt="">
+            <img class="post-img" src="${post.url}" alt="">
             <span class="messageText">${post.messageText}</span>
             <div class="like-section">
                 <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
                 <span class="like-counter">${post.likes}</span>
             </div>
             <div class="post-bottom">
-                <span class="post-name">Переслано от ${post.name}</span>
+                <span class="post-name">от: <b>${post.name}</b></span>
                 <span class="post-time">${dateAndTime}</span>
+            </div>
+
+            <div class="comments">              
+                <button class="collapse-button" onclick="toggleComments(${post.id})">Комментарии</button><br>
+                <div class="comment-list" id="comments-${post.id}">
+                    <!-- здесь будут комментарии -->
+                </div>
+                <div class="add-comment">
+                    <input type="text-comment" id="comment-input-${post.id}" placeholder="Ваш комментарий">
+                    
+                    <button onclick="clearComments(${post.id})">             
+                        &#10006;              
+                    </button>
+
+                    <button onclick="addComment(${post.id})">
+                        
+                        &#10095; 
+                    </button>
+                </div>
             </div>
         </div>
         `;
 
         messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
+        //loadCommentsFromLocalStorage(post.id); // Загружаем комментарии для данного поста
     });
+}
+
+function clearComments(postId) {
+    var commentsDiv = document.getElementById(`comments-${postId}`);
+    commentsDiv.innerHTML = ''; // Очищаем отображение комментариев
+
+    // Удаляем комментарии из локального хранилища
+    saveCommentsToLocalStorage(postId, []);
+}
+
+function toggleComments(postId) {
+    var commentsDiv = document.getElementById(`comments-${postId}`);
+    var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
+
+    if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+        // Комментарии еще не отображены, загружаем и показываем
+        commentsDiv.innerHTML = ''; // Сначала очистим содержимое, чтобы избежать дублирования комментариев при повторных кликах
+        loadCommentsFromLocalStorage(postId);
+
+        commentsDiv.style.display = 'block';
+        addCommentDiv.style.display = 'block';
+    } else {
+        // Комментарии уже отображены, скрываем их
+        commentsDiv.style.display = 'none';
+        addCommentDiv.style.display = 'none';
+    }
+}
+
+
+// Функция добавления комментария
+function addComment(postId) {
+    var commentInput = document.getElementById(`comment-input-${postId}`);
+    var commentText = commentInput.value.trim();
+    if (!commentText) {
+        alert('Пожалуйста, введите комментарий.');
+        return;
+    }
+
+    var avatarUrls = [
+        'https://avatars.mds.yandex.net/i?id=cde779dc1051c473acd14df966bc038f9a42fccf-8076535-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=e59519547ca3227798a2638fe587cbb80951a970-9181363-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=c3774dd0d3b48ce898170876d05252adb2f92b33-8901029-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=263c28e8d8eceea70895c904f880e212b64928c2-8294270-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=78d4ed45fafe9f6cedb2934f0fcc938cd1d52a20-9050759-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=22efaaa843cb7bb474908ebac7158661425bca3e-9065974-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=8d20c0d271e9053a2ca62b412c4a8dc56cc6515f-5246350-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=446edff486f12589defc380337cedb73969b09d3-9589172-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=4048803598b8161035afd54a2222509fa398a7c9-8427413-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=edae7179de7094050a8f791949a7c6856aadc8e7-9699538-images-thumbs&n=13',
+
+    ];
+
+    var randomIndex = Math.floor(Math.random() * avatarUrls.length);
+    var randomAvatarUrl = avatarUrls[randomIndex];
+
+    var comments = getCommentsFromLocalStorage(postId);
+    var commentId = Date.now().toString(); // Уникальный id для комментария
+
+    var comment = {
+        id: commentId,
+        text: commentText,
+        avatar: randomAvatarUrl // Сохраняем случайно выбранный URL аватара в объект комментария
+    };
+
+    comments.push(comment);
+    saveCommentsToLocalStorage(postId, comments);
+
+    // Очищаем поле ввода комментария
+    commentInput.value = '';
+
+    // Обновляем список комментариев на странице
+    loadCommentsFromLocalStorage(postId);
+}
+
+function getAvatarImage(avatarUrl) {
+    return `<img src="${avatarUrl}" alt="Avatar">`;
 }
 
 function formatTime(timestamp) {
@@ -203,6 +300,45 @@ function clearLocalStorage() {
     localStorage.removeItem('posts');
     localStorage.removeItem('likedPosts');
 }
+
+
+
+function getCommentsFromLocalStorage(postId) {
+    var commentsKey = `comments_${postId}`;
+    return JSON.parse(localStorage.getItem(commentsKey)) || [];
+}
+
+function saveCommentsToLocalStorage(postId, comments) {
+    var commentsKey = `comments_${postId}`;
+    localStorage.setItem(commentsKey, JSON.stringify(comments));
+}
+
+function loadCommentsFromLocalStorage(postId) {
+    var comments = getCommentsFromLocalStorage(postId);
+    var commentsDiv = document.getElementById(`comments-${postId}`);
+    var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
+
+    commentsDiv.innerHTML = '';
+
+    comments.forEach(function(comment) {
+        var commentHTML = `
+            <div class="comment" id="comment-${comment.id}">
+                <div class="avatar">
+                    <img src="${comment.avatar}" alt="Avatar">
+                </div>
+                <span>${comment.text}</span>
+            </div>
+        `;
+        commentsDiv.insertAdjacentHTML('beforeend', commentHTML);
+    });
+
+    // Показываем контейнер для комментариев
+    commentsDiv.style.display = 'block';
+
+    // Показываем форму для добавления комментария
+    addCommentDiv.style.display = 'block';
+}
+
 
 $('#mess_send').click(function () {
     var name = $('#name').val();
@@ -224,59 +360,23 @@ ws.onmessage = function(event) {
 
     let name, url, messageText;
 
+    const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
     if (messageData.reply_to_message) {
         const replyMessage = messageData.reply_to_message;
-        const replyText = replyMessage.text;
+        const replyText = replyMessage.text;       
         
-        const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
         [, name, url, messageText] = replyText.match(regex);
     } else {
-        const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
         const matchResult = message.match(regex);
         if (matchResult) {
         [, name, url, messageText] = matchResult;
-        // Дальнейший код, использующий name, url и messageText
-        } else {
-        // Обработка случая, когда не удалось получить совпадение
-        }
-    }
-
-    const messagesDiv = document.getElementById('messages');
-    messagesDiv.insertAdjacentHTML('afterbegin', 
-    `
-    <div class="img">
-        <img src="${url}" alt="">
-        <span>${messageText}</span>
-        <div class="like-section">
-            <button class="like-button" onclick="handleLike(this)">&#x2764;</button>
-            <span class="like-counter">0</span>
-        </div>
-        <div class="post-bottom">
-            <span class="post-name">Переслано от ${name}</span>
-            
-            <span class="post-time">${formatTime(messageData.date)}</span>
-        </div>
-    </div>
-    `);
+    }}
 
     savePostToLocalStorage(name, url, messageText, messageData.date);
+    loadPostsFromLocalStorage();
 };
-
-// function createPostElement(name, url, messageText, date) {
-//     return `
-//         <div class="img">
-//             <img title="${name}" src="${url}" alt="">
-//             <span>${messageText}</span>
-//             <div class="like-section">
-//                 <button class="like-button" onclick="handleLike(this)">&#x2764;</button>
-//                 <span class="like-counter">0</span>
-//             </div>
-//             <div class="post-time">${formatTime(date)}</div>
-//         </div>
-//     `;
-// }
 
 window.onload = function() {
     loadPostsFromLocalStorage();
     //clearLocalStorage();
-};
+}
