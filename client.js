@@ -219,21 +219,26 @@ function clearComments(postId) {
 function toggleComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
     var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
+    var commentListContent = document.getElementById(`comment-list-content-${postId}`);
+
+    if (!commentListContent) {
+        // Если элемент comment-list-content не существует, создаем его и вставляем внутрь контейнера comments
+        commentListContent = document.createElement('div');
+        commentListContent.setAttribute('id', `comment-list-content-${postId}`);
+        commentsDiv.appendChild(commentListContent);
+    }
 
     if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
         // Комментарии еще не отображены, загружаем и показываем
-        commentsDiv.innerHTML = ''; // Сначала очистим содержимое, чтобы избежать дублирования комментариев при повторных кликах
-        loadCommentsFromLocalStorage(postId);
+        commentListContent.innerHTML = ''; // Сначала очистим содержимое, чтобы избежать дублирования комментариев при повторных кликах
+        loadCommentsFromLocalStorage(postId, commentListContent); // Передаем commentListContent в качестве второго аргумента
 
         commentsDiv.style.display = 'block';
-        addCommentDiv.style.display = 'block';
     } else {
         // Комментарии уже отображены, скрываем их
         commentsDiv.style.display = 'none';
-        addCommentDiv.style.display = 'none';
     }
 }
-
 
 // Функция добавления комментария
 function addComment(postId) {
@@ -255,7 +260,18 @@ function addComment(postId) {
         'https://avatars.mds.yandex.net/i?id=446edff486f12589defc380337cedb73969b09d3-9589172-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=4048803598b8161035afd54a2222509fa398a7c9-8427413-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=edae7179de7094050a8f791949a7c6856aadc8e7-9699538-images-thumbs&n=13',
-
+        'https://sun6-20.userapi.com/impg/9TVl43WVejRnppg5eb-S0bCTL8abyPj-tWViJg/GgzmsahT_bM.jpg?size=558x604&quality=95&sign=0911bcee0b8f82685f837704c2227973&c_uniq_tag=nl3FCr16LgGtkNuigLKeGi119Uyv-LvY_pV4-OMTATI&type=album',
+        'https://sun9-51.userapi.com/impg/6-gx5sCHOiqah-KhkQHwGRKjrDsuIysVmQWIxw/lorjq2XvtAg.jpg?size=1000x1000&quality=95&sign=4e45e8ba7e24444239cb399edef3b132&type=album',
+        'https://sun9-52.userapi.com/impg/640lEsuO26RwdILDdjUgWghaVIjTBk1gSQGTSg/2bbZ0N-oKC0.jpg?size=807x634&quality=95&sign=81ba3178a69695c1f6e1035022df0e8d&c_uniq_tag=66T-ZYI_R5pzaJjWaNlNnNYxnjcUf7mo81BbBOIaavk&type=album',
+        'https://sun9-22.userapi.com/impg/GMWUpnWKiYDp39EZLriVq9tCw8hfA5HdeKgrVg/hXE6XEaQHyE.jpg?size=807x511&quality=95&sign=e8d9a1010bb515b53b9a2dad07fa7dab&c_uniq_tag=-NGf9hGC23FDbZarXxvHqu_qh_gLFDCIr_EczTeCvOo&type=album',
+        'https://avatars.mds.yandex.net/i?id=766f85e0244cca60524f0d952422acee862b383f-8564741-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=444d3714437929a22d186b8a702e1967cc7b6e70-9101109-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=c8bc077579879db179364499f6bef2bd398176aa-9182438-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=08013bbb6ae10bcd9d96d61e307922cbf78da35e-9148257-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=c390dedd62eb9bbf23b7159c3992134781ba5a32-4810024-images-thumbs&ref=rim&n=33&w=176&h=206',
+        'https://avatars.mds.yandex.net/i?id=6cb0327bc51493453930f62b3c641c5434060ef0-8438571-images-thumbs&ref=rim&n=33&w=164&h=206',
+        'https://avatars.mds.yandex.net/i?id=ac76d928c8d906448464f6951514df21475653e7-9152516-images-thumbs&n=13',
+        'https://avatars.mds.yandex.net/i?id=8eac33c1cabd16c1dd54fc848187149f41372189-9700546-images-thumbs&n=13',
     ];
 
     var randomIndex = Math.floor(Math.random() * avatarUrls.length);
@@ -317,7 +333,7 @@ function loadCommentsFromLocalStorage(postId) {
     var comments = getCommentsFromLocalStorage(postId);
     var commentsDiv = document.getElementById(`comments-${postId}`);
     var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
-
+    
     commentsDiv.innerHTML = '';
 
     comments.forEach(function(comment) {
@@ -334,9 +350,6 @@ function loadCommentsFromLocalStorage(postId) {
 
     // Показываем контейнер для комментариев
     commentsDiv.style.display = 'block';
-
-    // Показываем форму для добавления комментария
-    addCommentDiv.style.display = 'block';
 }
 
 

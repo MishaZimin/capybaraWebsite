@@ -184,7 +184,7 @@ header #about > a:hover {
     background-image: url('https://avatars.mds.yandex.net/i?id=79cd797f2be69d727ccc4be3d6bbbe61-5242289-images-thumbs&n=13');
     background-blend-mode: multiply;
     /* background-color: rgb(24, 24, 24); */
-    background-color: rgb(39, 39, 39);
+    background-color: rgb(30, 30, 30);
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -267,7 +267,7 @@ header #about > a:hover {
     /* gap: 10px calc(1rem - 1px); */
     margin-top: 1%;
     padding-bottom: 2%;
-    border-bottom: 1px solid rgb(28, 28, 28);
+    border-bottom: 1px solid rgb(25, 25, 25);
     .post-name {
         color: rgb(140, 140, 140)!important;
     }
@@ -317,10 +317,10 @@ header #about > a:hover {
 .like-button:disabled {
     color: red;
 }
-/* 
+
 .like-button:hover {
     color: red;
-} */
+}
 
 .like-button.liked {
     color: red;
@@ -375,6 +375,10 @@ header #about > a:hover {
     border-radius: 10px;
 }
 
+.collapse-button:hover {
+    color: rgba(220, 162, 111, 0.874);
+}
+
 .add-comment {
     width: 100%;
     display: flex;
@@ -396,10 +400,12 @@ header #about > a:hover {
 
 .add-comment input:hover {
     background-color: rgb(40, 40, 40);
+    /* color: rgb(30, 30, 30); */
 }
 
 .add-comment button:hover {
     background-color: rgb(40, 40, 40);
+    /* color: rgb(30, 30, 30); */
 }
 
 .add-comment button {
