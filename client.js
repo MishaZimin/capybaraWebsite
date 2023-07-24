@@ -373,7 +373,8 @@ ws.onmessage = function(event) {
 
     let name, url, messageText;
 
-    const regex = /([^ \n]+) \n([^ \n]+) \n([^]+)/;
+    const regex = /([^]+) \n([^ \n]+) \n([^]+)/;
+
     if (messageData.reply_to_message) {
         const replyMessage = messageData.reply_to_message;
         const replyText = replyMessage.text;       
