@@ -204,6 +204,7 @@ function loadPostsFromLocalStorage() {
         `;
 
         messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
+        
         //loadCommentsFromLocalStorage(post.id); // Загружаем комментарии для данного поста
     });
 }
@@ -233,12 +234,16 @@ function toggleComments(postId) {
         commentListContent.innerHTML = ''; // Сначала очистим содержимое, чтобы избежать дублирования комментариев при повторных кликах
         loadCommentsFromLocalStorage(postId, commentListContent); // Передаем commentListContent в качестве второго аргумента
 
-        commentsDiv.style.display = 'block';
+        //commentsDiv.style.display = 'block';
     } else {
         // Комментарии уже отображены, скрываем их
         commentsDiv.style.display = 'none';
     }
+
+    
 }
+
+
 
 // Функция добавления комментария
 function addComment(postId) {
@@ -303,13 +308,17 @@ function getAvatarImage(avatarUrl) {
 function formatTime(timestamp) {
     var date = new Date(timestamp * 1000);
     var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
+    var minutes = addLeadingZero(date.getMinutes());
+    var day = addLeadingZero(date.getDate());
+    var month = addLeadingZero(date.getMonth() + 1);
   
     var formattedDateAndTime = day + '/' + month + ' ' + hours + ':' + minutes;
   
     return formattedDateAndTime;
+}
+
+function addLeadingZero(number) {
+    return number < 10 ? '0' + number : number;
 }
 
 function clearLocalStorage() {
@@ -350,6 +359,11 @@ function loadCommentsFromLocalStorage(postId) {
 
     // Показываем контейнер для комментариев
     commentsDiv.style.display = 'block';
+}
+
+function getCommentCount(postId) {
+    var comments = getCommentsFromLocalStorage(postId);
+    return comments.length;
 }
 
 
