@@ -81,9 +81,9 @@ function handleLike(button) {
     if (button.classList.contains("liked")) {
         counter.innerText = count - 1;
         button.classList.remove("liked");
-        updateLikeCount(button.closest(".img").id, count - 1);
+        updateLikeCount(button.closest(".post").id, count - 1);
 
-        var postId = button.closest(".img").id;
+        var postId = button.closest(".post").id;
         var likedPosts = getLikedPostsFromLocalStorage();
         var index = likedPosts.indexOf(postId);
         if (index !== -1) {
@@ -95,10 +95,10 @@ function handleLike(button) {
         // Увеличиваем значение счетчика на 1 и обновляем его
         counter.innerText = count + 1;
         button.classList.add("liked");
-        updateLikeCount(button.closest(".img").id, count + 1); // Обновляем значение счетчика лайков в localStorage
+        updateLikeCount(button.closest(".post").id, count + 1); // Обновляем значение счетчика лайков в localStorage
 
         // Сохраняем информацию о нажатии кнопки лайка в localStorage
-        var postId = button.closest(".img").id;
+        var postId = button.closest(".post").id;
         var likedPosts = getLikedPostsFromLocalStorage();
         likedPosts.push(postId);
         saveLikedPostsToLocalStorage(likedPosts);
@@ -169,8 +169,8 @@ function loadPostsFromLocalStorage() {
     posts.forEach(function(post) {
         var dateAndTime = formatTime(post.timestamp);
 
-        var postHTML = `
-        <div class="img" id="${post.id}">
+        var postHTML = `    
+        <div class="post" id="${post.id}">
             <img class="post-img" src="${post.url}" alt="">
             <span class="messageText">${post.messageText}</span>
             <div class="like-section">
@@ -211,9 +211,8 @@ function loadPostsFromLocalStorage() {
 
 function clearComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
-    commentsDiv.innerHTML = ''; // Очищаем отображение комментариев
+    commentsDiv.innerHTML = '';
 
-    // Удаляем комментарии из локального хранилища
     saveCommentsToLocalStorage(postId, []);
 }
 
@@ -222,28 +221,33 @@ function toggleComments(postId) {
     var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
     var commentListContent = document.getElementById(`comment-list-content-${postId}`);
 
+
+    
     if (!commentListContent) {
-        // Если элемент comment-list-content не существует, создаем его и вставляем внутрь контейнера comments
         commentListContent = document.createElement('div');
         commentListContent.setAttribute('id', `comment-list-content-${postId}`);
         commentsDiv.appendChild(commentListContent);
     }
 
     if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
-        // Комментарии еще не отображены, загружаем и показываем
-        commentListContent.innerHTML = ''; // Сначала очистим содержимое, чтобы избежать дублирования комментариев при повторных кликах
-        loadCommentsFromLocalStorage(postId, commentListContent); // Передаем commentListContent в качестве второго аргумента
-
-        //commentsDiv.style.display = 'block';
+        commentListContent.innerHTML = '';
+        loadCommentsFromLocalStorage(postId, commentListContent);
     } else {
-        // Комментарии уже отображены, скрываем их
         commentsDiv.style.display = 'none';
-    }
-
-    
+    } 
 }
 
 
+var banWords = ["бля", "хуй", "сук", "еба", "ебу", "пизд"];
+
+function isCommentValid(comment) {
+    for (var i = 0; i < banWords.length; i++) {
+        if (comment.indexOf(banWords[i]) !== -1) {
+            return false;
+        }
+    }
+    return true;
+}
 
 // Функция добавления комментария
 function addComment(postId) {
@@ -251,6 +255,11 @@ function addComment(postId) {
     var commentText = commentInput.value.trim();
     if (!commentText) {
         alert('Пожалуйста, введите комментарий.');
+        return;
+    }
+
+    if (!isCommentValid(commentText)) {
+        alert('пошел нахуй уебан');
         return;
     }
 
@@ -288,7 +297,8 @@ function addComment(postId) {
     var comment = {
         id: commentId,
         text: commentText,
-        avatar: randomAvatarUrl // Сохраняем случайно выбранный URL аватара в объект комментария
+        avatar: randomAvatarUrl,// Сохраняем случайно выбранный URL аватара в объект комментария
+        timestamp: Math.floor(Date.now() / 1000)
     };
 
     comments.push(comment);
@@ -299,6 +309,7 @@ function addComment(postId) {
 
     // Обновляем список комментариев на странице
     loadCommentsFromLocalStorage(postId);
+    console.log(comment.timestamp);
 }
 
 function getAvatarImage(avatarUrl) {
@@ -312,7 +323,7 @@ function formatTime(timestamp) {
     var day = addLeadingZero(date.getDate());
     var month = addLeadingZero(date.getMonth() + 1);
   
-    var formattedDateAndTime = day + '/' + month + ' ' + hours + ':' + minutes;
+    var formattedDateAndTime = day + '.' + month + ' ' + hours + ':' + minutes;
   
     return formattedDateAndTime;
 }
@@ -351,7 +362,8 @@ function loadCommentsFromLocalStorage(postId) {
                 <div class="avatar">
                     <img src="${comment.avatar}" alt="Avatar">
                 </div>
-                <span>${comment.text}</span>
+                <span class="comment-text">${comment.text}</span>
+                <span class="comment-time">${formatTime(comment.timestamp)}</span>
             </div>
         `;
         commentsDiv.insertAdjacentHTML('beforeend', commentHTML);

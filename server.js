@@ -1,5 +1,233 @@
-
 //node "C:\Users\Зимин Михаил\OneDrive\Рабочий стол\hello world\capybaraWebsite\server.js"
+
+{  
+  const TelegramBot = require('node-telegram-bot-api');
+  const WebSocket = require('ws');
+  const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
+  
+  const bot = new TelegramBot(token, { polling: true });
+  const wss = new WebSocket.Server({ port: 8080 });
+  
+  
+  wss.on('connection', (ws) => {
+    console.log('Установлено новое WebSocket соединение');
+    ws.on('message', (message) => {
+      console.log('Получено сообщение из WebSocket:', message);
+    });
+  });
+  
+  
+  bot.on('message', (msg) => {
+    const messageData = msg;
+    console.log('Получено сообщение:', messageData);
+    const messageDataString = JSON.stringify(messageData);
+    wss.clients.forEach((client) => {
+      client.send(messageDataString);
+    });
+    bot.sendMessage(msg.chat.id, 'Получено');
+  });
+}
+
+
+
+// const TelegramBot = require('node-telegram-bot-api');
+// const WebSocket = require('ws');
+// const http = require('http');
+// const mongoose = require('mongoose');
+
+// const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
+// const bot = new TelegramBot(token, { polling: true });
+// const wss = new WebSocket.Server({ port: 8080 });
+
+// // Подключение к MongoDB
+// mongoose.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// // Определение схемы и модели для постов
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+//   likes: Number,
+//   timestamp: Number,
+// });
+
+// const Post = mongoose.model('Post', postSchema);
+
+// wss.on('connection', (ws) => {
+//   console.log('Установлено новое WebSocket соединение');
+//   ws.on('message', (message) => {
+//     console.log('Получено сообщение из WebSocket:', message);
+//   });
+// });
+
+// bot.on('message', (msg) => {
+//   const messageData = msg;
+//   console.log('Получено сообщение:', messageData);
+//   const messageDataString = JSON.stringify(messageData);
+//   wss.clients.forEach((client) => {
+//     client.send(messageDataString);
+//   });
+
+//   // Сохраняем данные в MongoDB
+//   saveMessageToMongoDB(msg);
+
+//   bot.sendMessage(msg.chat.id, 'Получено');
+// });
+
+// // Функция для сохранения сообщений в MongoDB
+// async function saveMessageToMongoDB(messageData) {
+//   try {
+//     const { chat, text, from, date, reply_to_message } = messageData;
+//     const { id, first_name, last_name, username } = from;
+//     const { id: chatId, type } = chat;
+
+//     let name, url, messageText;
+
+//     if (reply_to_message) {
+//       // Если есть пересланное сообщение, извлекаем данные из него
+//       const { text: replyText } = reply_to_message;
+//       const regex = /([^]+) \n([^ \n]+) \n([^]+)/;
+//       [, name, url, messageText] = replyText.match(regex);
+//     } else {
+//       // Если пересланного сообщения нет, используем данные текущего сообщения
+//       const regex = /([^]+) \n([^ \n]+) \n([^]+)/;
+//       [, name, url, messageText] = text.match(regex);
+//     }
+
+//     const post = new Post({
+//       name: name || (username ? `@${username}` : `${first_name} ${last_name}`),
+//       url: url || `https://t.me/${type === 'private' ? 'c' : 's'}/${chatId}/${messageData.message_id}`,
+//       messageText: messageText || text,
+//       likes: 0,
+//       timestamp: date,
+//     });
+
+//     await post.save({ wtimeout: 0 });
+//     console.log('Сообщение успешно сохранено в базу данных.');
+//   } catch (error) {
+//     console.error('Ошибка при сохранении сообщения:', error);
+//   }
+// }
+
+
+
+
+
+// // Создаем HTTP сервер
+// const server = http.createServer((req, res) => {
+//   // Middleware для разрешения CORS
+//   res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+//   // Обрабатываем запросы здесь
+//   if (req.method === 'GET' && req.url === '/api/posts') {
+//     // Возвращаем список постов из MongoDB при запросе /api/posts
+//     Post.find()
+//       .then((posts) => {
+//         res.setHeader('Content-Type', 'application/json');
+//         res.end(JSON.stringify(posts));
+//       })
+//       .catch((error) => {
+//         console.error('Ошибка при получении постов из MongoDB:', error);
+//         res.writeHead(500, { 'Content-Type': 'application/json' });
+//         res.end(JSON.stringify({ error: 'Ошибка при получении постов из MongoDB' }));
+//       });
+//   } else {
+//     // Возвращаем 404 Not Found для всех других запросов
+//     res.writeHead(404, { 'Content-Type': 'application/json' });
+//     res.end(JSON.stringify({ error: 'Not Found' }));
+//   }
+// });
+
+// // Запускаем сервер на порту 3000 (или любом другом порту по вашему выбору)
+// const PORT = 3000;
+// server.listen(PORT, () => {
+//   console.log(`Сервер запущен на порту ${PORT}`);
+// });
+
+
+
+
+
+
+
+// const TelegramBot = require('node-telegram-bot-api');
+// const WebSocket = require('ws');
+// const mongoose = require('mongoose');
+
+// const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
+// const bot = new TelegramBot(token, { polling: true });
+// const wss = new WebSocket.Server({ port: 8080 });
+
+// // Подключение к MongoDB
+// mongoose.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// // Определение схемы и модели для постов
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+//   likes: Number,
+//   timestamp: Number,
+// });
+
+// const Post = mongoose.model('Post', postSchema);
+
+// wss.on('connection', (ws) => {
+//   console.log('Установлено новое WebSocket соединение');
+//   ws.on('message', (message) => {
+//     console.log('Получено сообщение из WebSocket:', message);
+//   });
+// });
+
+// bot.on('message', (msg) => {
+//   const messageData = msg;
+//   console.log('Получено сообщение:', messageData);
+//   const messageDataString = JSON.stringify(messageData);
+//   wss.clients.forEach((client) => {
+//     client.send(messageDataString);
+//   });
+
+//   // Сохраняем данные в MongoDB
+//   saveMessageToMongoDB(msg);
+  
+//   bot.sendMessage(msg.chat.id, 'Получено');
+// });
+
+// // Функция для сохранения сообщений в MongoDB
+// function saveMessageToMongoDB(messageData) {
+//   const { chat, text, from, date } = messageData;
+//   const { id, first_name, last_name, username } = from;
+//   const { id: chatId, title, type } = chat;
+
+//   const post = new Post({
+//     name: username ? `@${username}` : `${first_name} ${last_name}`,
+//     url: `https://t.me/${type === 'private' ? 'c' : 's'}/${chatId}/${id}`,
+//     messageText: text,
+//     likes: 0,
+//     timestamp: date,
+//   });
+
+//   post.save((err) => {
+//     if (err) {
+//       console.error('Ошибка при сохранении сообщения:', err);
+//     } else {
+//       console.log('Сообщение успешно сохранено в базу данных.');
+//     }
+//   });
+// }
+
+
+
+
+
+
 // const TelegramBot = require('node-telegram-bot-api');
 // const WebSocket = require('ws');
 // const fs = require('fs');
@@ -122,33 +350,7 @@
 //const connectionString = 'mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/';
 
 
-{  
-const TelegramBot = require('node-telegram-bot-api');
-const WebSocket = require('ws');
-const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
 
-const bot = new TelegramBot(token, { polling: true });
-const wss = new WebSocket.Server({ port: 8080 });
-
-
-wss.on('connection', (ws) => {
-  console.log('Установлено новое WebSocket соединение');
-  ws.on('message', (message) => {
-    console.log('Получено сообщение из WebSocket:', message);
-  });
-});
-
-
-bot.on('message', (msg) => {
-  const messageData = msg;
-  console.log('Получено сообщение:', messageData);
-  const messageDataString = JSON.stringify(messageData);
-  wss.clients.forEach((client) => {
-    client.send(messageDataString);
-  });
-  bot.sendMessage(msg.chat.id, 'Получено');
-});
-}
 
 // const app = express();
 // const port = 5050;
