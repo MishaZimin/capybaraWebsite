@@ -13,45 +13,6 @@ $(document).on("scroll", function () {
     }
 });
 
-
-// function loadPostsFromServer() {
-//     $.ajax({
-//       url: '/notes',
-//       method: 'GET',
-//       success: function (response) {
-//         var posts = JSON.parse(response);
-//         // Обработка полученных данных
-//         posts.forEach(function(post) {
-//             var dateAndTime = formatTime(post.timestamp);
-    
-//             var postHTML = `
-//             <div class="img" id="${post.id}">
-//                 <img src="${post.url}" alt="">
-//                 <span class="messageText">${post.messageText}</span>
-//                 <div class="like-section">
-//                     <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
-//                     <span class="like-counter">${post.likes}</span>
-//                 </div>
-//                 <div class="post-bottom">
-//                     <span class="post-name">Переслано от ${post.name}</span>
-//                     <span class="post-time">${dateAndTime}</span>
-//                 </div>
-//             </div>
-//             `;
-    
-//             messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
-//         });
-//       },
-//       error: function (error) {
-//         console.log('Ошибка при загрузке постов:', error.statusText);
-//       },
-//     });
-//   }
-  
-//   $(document).ready(function () {
-//     loadPostsFromServer();
-//   });
-
 function sendTelegramMessage(name, url, message) {
     var telegramBotToken = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
     var telegramChatId = '997616670';
@@ -183,46 +144,99 @@ function loadPostsFromLocalStorage() {
             </div>
 
             <div class="comments">              
-                <button class="collapse-button" onclick="toggleComments(${post.id})">Комментарии</button><br>
+                <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b></button>
                 <div class="comment-list" id="comments-${post.id}">
                     <!-- здесь будут комментарии -->
-                </div>
-                <div class="add-comment">
-                    <input type="text-comment" id="comment-input-${post.id}" placeholder="Ваш комментарий">
-                    
-                    <button onclick="clearComments(${post.id})">             
-                        &#10006;              
-                    </button>
 
-                    <button onclick="addComment(${post.id})">
+                    <div class="add-comment">
+                        <input type="text-comment" id="comment-input-${post.id}" placeholder="комментарий">
                         
-                        &#10095; 
-                    </button>
+                        <button onclick="clearComments(${post.id})">             
+                            &#10006;              
+                        </button>
+
+                        <button onclick="addComment(${post.id})">                      
+                            &#10095; 
+                        </button>
+                    </div>
                 </div>
+                
             </div>
         </div>
         `;
 
         messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
-        
+        var commentsDiv = document.getElementById(`comments-${post.id}`);
+        commentsDiv.style.display = 'none';
         //loadCommentsFromLocalStorage(post.id); // Загружаем комментарии для данного поста
     });
 }
+
+// function loadPostsFromLocalStorage() {
+//     var posts = getPostsFromLocalStorage();
+
+//     posts.sort(function(a, b) {
+//         return a.likes - b.likes;
+//     });
+
+//     var messagesDiv = document.getElementById('messages');
+//     messagesDiv.innerHTML = '';
+
+//     posts.forEach(function(post) {
+//         var dateAndTime = formatTime(post.timestamp);
+
+//         var postHTML = `    
+//         <div class="post" id="${post.id}">
+//             <img class="post-img" src="${post.url}" alt="">
+//             <span class="messageText">${post.messageText}</span>
+//             <div class="like-section">
+//                 <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
+//                 <span class="like-counter">${post.likes}</span>
+//             </div>
+//             <div class="post-bottom">
+//                 <span class="post-name">от: <b>${post.name}</b></span>
+//                 <span class="post-time">${dateAndTime}</span>
+//             </div>
+
+//             <div class="comments">              
+//                 <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b></button><br>
+//                 <div class="comment-list" id="comments-${post.id}">
+//                     <!-- здесь будут комментарии -->
+//                 </div>
+//                 <div class="add-comment" id="comments-${post.id}">
+//                     <input type="text-comment" id="comment-input-${post.id}" placeholder="Комментарий">
+                    
+//                     <button onclick="clearComments(${post.id})">             
+//                         &#10006;              
+//                     </button>
+
+//                     <button onclick="addComment(${post.id})">                      
+//                         &#10095; 
+//                     </button>
+//                 </div>
+//             </div>
+//         </div>
+//         `;
+
+//         messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
+        
+//         //loadCommentsFromLocalStorage(post.id); // Загружаем комментарии для данного поста
+//     });
+// }
 
 function clearComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
     commentsDiv.innerHTML = '';
 
     saveCommentsToLocalStorage(postId, []);
+    commentsDiv.style.display = 'none';
 }
 
 function toggleComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
-    var addCommentDiv = document.querySelector(`#comments-${postId} .add-comment`);
-    var commentListContent = document.getElementById(`comment-list-content-${postId}`);
-
-
     
+    var commentListContent = document.getElementById(`comment-list-content-${postId}`);
+      
     if (!commentListContent) {
         commentListContent = document.createElement('div');
         commentListContent.setAttribute('id', `comment-list-content-${postId}`);
@@ -232,8 +246,9 @@ function toggleComments(postId) {
     if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
         commentListContent.innerHTML = '';
         loadCommentsFromLocalStorage(postId, commentListContent);
+        // commentsDiv.style.display = 'block';
     } else {
-        commentsDiv.style.display = 'none';
+        commentsDiv.style.display = 'none';       
     } 
 }
 
@@ -309,7 +324,9 @@ function addComment(postId) {
 
     // Обновляем список комментариев на странице
     loadCommentsFromLocalStorage(postId);
-    console.log(comment.timestamp);
+    
+    // loadAddCommentsFromLocalStorage(postId);
+    // console.log(comment.timestamp);
 }
 
 function getAvatarImage(avatarUrl) {
@@ -323,7 +340,7 @@ function formatTime(timestamp) {
     var day = addLeadingZero(date.getDate());
     var month = addLeadingZero(date.getMonth() + 1);
   
-    var formattedDateAndTime = day + '.' + month + ' ' + hours + ':' + minutes;
+    var formattedDateAndTime = hours + ':' + minutes + ' ' + day + '/' + month;
   
     return formattedDateAndTime;
 }
@@ -369,7 +386,21 @@ function loadCommentsFromLocalStorage(postId) {
         commentsDiv.insertAdjacentHTML('beforeend', commentHTML);
     });
 
-    // Показываем контейнер для комментариев
+    var addCommentHTML = `
+        <div class="add-comment" id="comment-${postId}">
+            <input type="text-comment" id="comment-input-${postId}" placeholder="комментарий">
+            
+            <button onclick="clearComments(${postId})">             
+                &#10006;              
+            </button>
+
+            <button onclick="addComment(${postId})">                      
+                &#10095; 
+            </button>
+        </div>
+    `;
+    commentsDiv.insertAdjacentHTML('beforeend', addCommentHTML);
+
     commentsDiv.style.display = 'block';
 }
 
@@ -409,8 +440,9 @@ ws.onmessage = function(event) {
     } else {
         const matchResult = message.match(regex);
         if (matchResult) {
-        [, name, url, messageText] = matchResult;
-    }}
+            [, name, url, messageText] = matchResult;
+        }
+    }
 
     savePostToLocalStorage(name, url, messageText, messageData.date);
     loadPostsFromLocalStorage();
