@@ -120,15 +120,17 @@ function saveLikedPostsToLocalStorage(likedPosts) {
 function loadPostsFromLocalStorage() {
     var posts = getPostsFromLocalStorage();
 
-    posts.sort(function(a, b) {
-        return a.likes - b.likes;
-    });
+    // posts.sort(function(a, b) {
+    //     return a.likes - b.likes;
+    // });
 
     var messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
 
+    
     posts.forEach(function(post) {
         var dateAndTime = formatTime(post.timestamp);
+        var comments = getCommentsFromLocalStorage(post.id);
 
         var postHTML = `    
         <div class="post" id="${post.id}">
@@ -144,7 +146,7 @@ function loadPostsFromLocalStorage() {
             </div>
 
             <div class="comments">              
-                <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b></button>
+                <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b>  ${comments.length}</button>
                 <div class="comment-list" id="comments-${post.id}">
                     <!-- здесь будут комментарии -->
 
@@ -172,63 +174,13 @@ function loadPostsFromLocalStorage() {
     });
 }
 
-// function loadPostsFromLocalStorage() {
-//     var posts = getPostsFromLocalStorage();
-
-//     posts.sort(function(a, b) {
-//         return a.likes - b.likes;
-//     });
-
-//     var messagesDiv = document.getElementById('messages');
-//     messagesDiv.innerHTML = '';
-
-//     posts.forEach(function(post) {
-//         var dateAndTime = formatTime(post.timestamp);
-
-//         var postHTML = `    
-//         <div class="post" id="${post.id}">
-//             <img class="post-img" src="${post.url}" alt="">
-//             <span class="messageText">${post.messageText}</span>
-//             <div class="like-section">
-//                 <button class="like-button${post.likes > 0 ? ' liked' : ''}" onclick="handleLike(this)">&#x2764;</button>
-//                 <span class="like-counter">${post.likes}</span>
-//             </div>
-//             <div class="post-bottom">
-//                 <span class="post-name">от: <b>${post.name}</b></span>
-//                 <span class="post-time">${dateAndTime}</span>
-//             </div>
-
-//             <div class="comments">              
-//                 <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b></button><br>
-//                 <div class="comment-list" id="comments-${post.id}">
-//                     <!-- здесь будут комментарии -->
-//                 </div>
-//                 <div class="add-comment" id="comments-${post.id}">
-//                     <input type="text-comment" id="comment-input-${post.id}" placeholder="Комментарий">
-                    
-//                     <button onclick="clearComments(${post.id})">             
-//                         &#10006;              
-//                     </button>
-
-//                     <button onclick="addComment(${post.id})">                      
-//                         &#10095; 
-//                     </button>
-//                 </div>
-//             </div>
-//         </div>
-//         `;
-
-//         messagesDiv.insertAdjacentHTML('afterbegin', postHTML);
-        
-//         //loadCommentsFromLocalStorage(post.id); // Загружаем комментарии для данного поста
-//     });
-// }
-
 function clearComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
     commentsDiv.innerHTML = '';
 
     saveCommentsToLocalStorage(postId, []);
+    loadPostsFromLocalStorage(postId)
+    loadCommentsFromLocalStorage(postId);
     commentsDiv.style.display = 'none';
 }
 
@@ -246,16 +198,14 @@ function toggleComments(postId) {
     if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
         commentListContent.innerHTML = '';
         loadCommentsFromLocalStorage(postId, commentListContent);
-        // commentsDiv.style.display = 'block';
     } else {
         commentsDiv.style.display = 'none';       
     } 
 }
 
-
-var banWords = ["бля", "хуй", "сук", "еба", "ебу", "пизд"];
-
 function isCommentValid(comment) {
+    var banWords = ["бля", "хуй", "сук", "еба", "ебу", "пизд"];
+
     for (var i = 0; i < banWords.length; i++) {
         if (comment.indexOf(banWords[i]) !== -1) {
             return false;
@@ -289,10 +239,6 @@ function addComment(postId) {
         'https://avatars.mds.yandex.net/i?id=446edff486f12589defc380337cedb73969b09d3-9589172-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=4048803598b8161035afd54a2222509fa398a7c9-8427413-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=edae7179de7094050a8f791949a7c6856aadc8e7-9699538-images-thumbs&n=13',
-        'https://sun6-20.userapi.com/impg/9TVl43WVejRnppg5eb-S0bCTL8abyPj-tWViJg/GgzmsahT_bM.jpg?size=558x604&quality=95&sign=0911bcee0b8f82685f837704c2227973&c_uniq_tag=nl3FCr16LgGtkNuigLKeGi119Uyv-LvY_pV4-OMTATI&type=album',
-        'https://sun9-51.userapi.com/impg/6-gx5sCHOiqah-KhkQHwGRKjrDsuIysVmQWIxw/lorjq2XvtAg.jpg?size=1000x1000&quality=95&sign=4e45e8ba7e24444239cb399edef3b132&type=album',
-        'https://sun9-52.userapi.com/impg/640lEsuO26RwdILDdjUgWghaVIjTBk1gSQGTSg/2bbZ0N-oKC0.jpg?size=807x634&quality=95&sign=81ba3178a69695c1f6e1035022df0e8d&c_uniq_tag=66T-ZYI_R5pzaJjWaNlNnNYxnjcUf7mo81BbBOIaavk&type=album',
-        'https://sun9-22.userapi.com/impg/GMWUpnWKiYDp39EZLriVq9tCw8hfA5HdeKgrVg/hXE6XEaQHyE.jpg?size=807x511&quality=95&sign=e8d9a1010bb515b53b9a2dad07fa7dab&c_uniq_tag=-NGf9hGC23FDbZarXxvHqu_qh_gLFDCIr_EczTeCvOo&type=album',
         'https://avatars.mds.yandex.net/i?id=766f85e0244cca60524f0d952422acee862b383f-8564741-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=444d3714437929a22d186b8a702e1967cc7b6e70-9101109-images-thumbs&n=13',
         'https://avatars.mds.yandex.net/i?id=c8bc077579879db179364499f6bef2bd398176aa-9182438-images-thumbs&n=13',
@@ -307,26 +253,24 @@ function addComment(postId) {
     var randomAvatarUrl = avatarUrls[randomIndex];
 
     var comments = getCommentsFromLocalStorage(postId);
-    var commentId = Date.now().toString(); // Уникальный id для комментария
+    var commentId = Date.now().toString();
+    var commentName = "@capybara"; 
 
     var comment = {
         id: commentId,
+        name: commentName + commentId,
+        likes: 0,
         text: commentText,
-        avatar: randomAvatarUrl,// Сохраняем случайно выбранный URL аватара в объект комментария
+        avatar: randomAvatarUrl,
         timestamp: Math.floor(Date.now() / 1000)
     };
 
     comments.push(comment);
     saveCommentsToLocalStorage(postId, comments);
 
-    // Очищаем поле ввода комментария
     commentInput.value = '';
-
-    // Обновляем список комментариев на странице
+    loadPostsFromLocalStorage(postId)
     loadCommentsFromLocalStorage(postId);
-    
-    // loadAddCommentsFromLocalStorage(postId);
-    // console.log(comment.timestamp);
 }
 
 function getAvatarImage(avatarUrl) {
@@ -379,8 +323,15 @@ function loadCommentsFromLocalStorage(postId) {
                 <div class="avatar">
                     <img src="${comment.avatar}" alt="Avatar">
                 </div>
-                <span class="comment-text">${comment.text}</span>
-                <span class="comment-time">${formatTime(comment.timestamp)}</span>
+                <span class="comment-text">
+                    <p class="comment-name">${comment.name}</p>
+                    ${comment.text}
+                </span>
+                <span class="comment-right">
+                    <p class="comment-time">
+                        ${formatTime(comment.timestamp)}
+                    </p>
+                </span>
             </div>
         `;
         commentsDiv.insertAdjacentHTML('beforeend', commentHTML);
@@ -423,7 +374,6 @@ $('#mess_send').click(function () {
 });
 
 const ws = new WebSocket('ws://localhost:8080');
-
 ws.onmessage = function(event) {
     const messageData = JSON.parse(event.data);
     const message = messageData.text;
@@ -450,5 +400,5 @@ ws.onmessage = function(event) {
 
 window.onload = function() {
     loadPostsFromLocalStorage();
-    //clearLocalStorage();
+    // ! clearLocalStorage();
 }

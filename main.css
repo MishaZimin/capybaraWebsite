@@ -37,6 +37,7 @@ header #logo {
     text-decoration: none;
     padding-left: 1%;
     transition: transform 0.15s ease;
+    
 }
 
 header #logo:hover {
@@ -167,7 +168,7 @@ header #about > a:hover {
     float: left;
     background-image: url('https://avatars.mds.yandex.net/i?id=79cd797f2be69d727ccc4be3d6bbbe61-5242289-images-thumbs&n=13');
     background-blend-mode: multiply;
-    background-color: rgb(30, 30, 30);
+    background-color: rgb(24, 24, 24);
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -338,12 +339,21 @@ header #about > a:hover {
     padding: 1%;
 }
 
+
+
 .comment .comment-text {
+    /* font-size: 1.2em!important; */
     line-height: 1.5;
-    padding: 0% 1% 1% 3%;
+    padding: 0% 1% 3% 3%;
 }
 
-.comment .comment-time {
+.comment-name {
+    font-size: 0.8em!important;
+    color: rgb(140, 140, 140)!important;
+    padding-bottom: 2%;
+}
+
+.comment .comment-right {
     position: relative;
     font-size: 0.8em!important;
     flex-basis: 30%;
@@ -354,10 +364,11 @@ header #about > a:hover {
 }
 
 
-.comment .comment-time span {
+.comment .comment-right span {
     position: absolute;
     vertical-align: text-bottom;
 }
+
 .collapse-button {
     text-align: left;
     background-color: rgb(35, 35, 35);
@@ -394,7 +405,7 @@ header #about > a:hover {
     width: 98%;
     display: flex;
     padding-top: 0%;
-    margin-top: 1%;
+    margin-top: 1.5%;
     margin-bottom: 1%;
     margin-left: 1%;
 }
@@ -556,8 +567,8 @@ header #about > a:hover {
 
 @media (min-width: 901px) and (max-width: 1400px) {  
     #overview .post {
-        width: 40%;
-        margin-left: 30%;
+        width: 50%;
+        margin-left: 25%;
     }
     
     #overview span {
@@ -575,8 +586,8 @@ header #about > a:hover {
     }
 
     #contacts {
-        width: 40%;
-        margin: 150px 30%;
+        width: 50%;
+        margin: 150px 25%;
     }
 }
 
@@ -586,8 +597,8 @@ header #about > a:hover {
     }
 
     #overview .post {
-        width: 60%;
-        margin-left: 20%;
+        width: 70%;
+        margin-left: 15%;
     }
     
     .post-time {
@@ -601,13 +612,13 @@ header #about > a:hover {
     }
 
     #contacts {
-        width: 60%;
-        margin: 150px 20%;
+        width: 70%;
+        margin: 150px 15%;
     }
 }
 
 @media (max-width: 500px) {
-    header {
+    /* header {
         flex-direction: column;    
     }
     
@@ -623,6 +634,16 @@ header #about > a:hover {
 
     header #about > a{
         padding: 5px 15px;
+    } */
+
+    header #logo {
+        font-size: 1.6em;
+    }
+
+    header #about {
+
+        gap: 0px;
+        font-size: 0.8em;
     }
 
     #top {
@@ -646,8 +667,9 @@ header #about > a:hover {
     }
 
     #overview .post {
-        width: 80%;
-        margin-left: 10%;
+        width: 90%;
+        margin-left: 5%;
+        margin-bottom: 5%;
         /* padding-bottom: 1%; */
     }
 
@@ -660,8 +682,8 @@ header #about > a:hover {
     }
 
     #contacts {
-        width: 80%;
-        margin: 10% 10%;
+        width: 90%;
+        margin: 10% 5%;
     }
 
     #contacts h5 {
