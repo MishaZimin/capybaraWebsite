@@ -13,6 +13,20 @@ body, html {
     height: 2000px;
 }
 
+html::-webkit-scrollbar {
+    width: 10px; /* Толщина полосы прокрутки для Webkit браузеров (Chrome, Safari) */
+    
+}
+  
+html::-webkit-scrollbar-thumb {
+    background-color: rgb(45, 45, 45); /* Цвет полосы прокрутки */
+    border-radius: 10px;
+}
+
+html::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.02); /* Цвет фона прокрутки */
+}
+
 body {
     background-color: rgb(25, 25, 25);
 }
@@ -292,7 +306,7 @@ header #about > a:hover {
 
 .comments {
     /* padding: 1% 2% 1.5% 2%; */
-    padding: 2%;
+    padding: 2% 2% 2% 2%;
     border-radius: 10px;
 }
 
@@ -355,8 +369,8 @@ header #about > a:hover {
 
 .comment .comment-right {
     position: relative;
-    font-size: 0.8em!important;
-    flex-basis: 30%;
+    font-size: 0.85em!important;
+    flex-basis: 25%;
     text-align: right;
     color: rgb(140, 140, 140)!important;
     max-width: 45px;
@@ -398,7 +412,7 @@ header #about > a:hover {
 
 .avatar:active {
     z-index: 2;
-    transform: scale(3);
+    transform: scale(1.9);
 }
 
 .add-comment {
@@ -419,6 +433,31 @@ header #about > a:hover {
     border: 1px solid rgb(35, 35, 35);
     color: rgb(255, 255, 255);
     background-color: rgb(30, 30, 30);   
+}
+
+.comment-list {
+    max-height: 500px!important;
+    overflow-y: auto;
+    /* border: 1px solid #ccc; */
+    padding: 0px 1% 2% 1%;
+
+    scrollbar-width: thin; /* Толщина полосы прокрутки */
+    scrollbar-color: #999 #eee; /* Цвет полосы и фона прокрутки */
+    
+}
+
+.comment-list::-webkit-scrollbar {
+    width: 8px; /* Толщина полосы прокрутки для Webkit браузеров (Chrome, Safari) */
+    
+}
+  
+.comment-list::-webkit-scrollbar-thumb {
+    background-color: rgb(45, 45, 45); /* Цвет полосы прокрутки */
+    border-radius: 10px;
+}
+
+.comment-list::-webkit-scrollbar-track {
+    background-color: rgb(35, 35, 35); /* Цвет фона прокрутки */
 }
 
 .comments .collapse-button:hover {
@@ -649,7 +688,7 @@ header #about > a:hover {
     #top {
         font-size: 1.5em;
         padding-top: 50%;
-        height: 800px;
+        height: 1000px;
     }
 
     #main .intro h2 {
@@ -679,6 +718,11 @@ header #about > a:hover {
 
     .avatar {
         aspect-ratio: 7.205/6;   
+    }
+
+    .comment-list {
+        max-height: 400px!important;
+        overflow-y: auto;
     }
 
     #contacts {

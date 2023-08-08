@@ -72,12 +72,12 @@ function savePostToLocalStorage(name, url, messageText, timestamp) {
     var posts = getPostsFromLocalStorage();
 
     var post = {
-        id: Date.now().toString(), // id поста
-        name: name, // имя автора
-        url: url, // url поста
-        messageText: messageText, // текст сообщения
-        likes: 0, // количество лайков
-        timestamp: timestamp // время публикации поста
+        id: Date.now().toString(),
+        name: name,
+        url: url,
+        messageText: messageText,
+        likes: 0,
+        timestamp: timestamp
     };
 
     posts.push(post);
@@ -86,12 +86,12 @@ function savePostToLocalStorage(name, url, messageText, timestamp) {
 
 
 function updateLikeCount(postId, count) {
-    var allPosts = getPostsFromLocalStorage();
-    var postToUpdate = findPostById(allPosts, postId);
+    var posts = getPostsFromLocalStorage();
+    var postToUpdate = findPostById(posts, postId);
   
     if (postToUpdate) {
       postToUpdate.likes = count;
-      savePostsToLocalStorage(allPosts);
+      savePostsToLocalStorage(posts);
     }
 }
 
@@ -117,12 +117,56 @@ function saveLikedPostsToLocalStorage(likedPosts) {
     localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
 }
 
+const messages = [];
+
+// Получение сообщения и добавление его в массив
+const receivedMessage = {
+    message_id: 1205,
+    from: {
+      id: 997616670,
+      is_bot: false,
+      first_name: 'Миша',
+      username: 'mi424sha',
+      language_code: 'ru'
+    },
+    chat: {
+      id: 997616670,
+      first_name: 'Миша',
+      username: 'mi424sha',
+      type: 'private'
+    },
+    date: 1691418745,
+    reply_to_message: {
+      message_id: 1204,
+      from: {
+        id: 6392841364,
+        is_bot: true,
+        first_name: 'bot',
+        username: 'hjfdjhfjd_bot'
+      },
+      chat: {
+        id: 997616670,
+        first_name: 'Миша',
+        username: 'mi424sha',
+        type: 'private'
+      },
+      date: 1691418737,
+      text: 'test \n' +
+        'https://avatars.mds.yandex.net/i?id=886c2195058947b4cd8e7bd65e8dd619730269dc-4835468-images-thumbs&n=13 \n' +
+        "Test (assessment), an educational assessment intended to measure the respondents' knowledge or other abilities",
+      entities: [ [Object] ]
+    },
+    text: 'fdfd'
+};
+
+
+
 function loadPostsFromLocalStorage() {
     var posts = getPostsFromLocalStorage();
 
     // posts.sort(function(a, b) {
     //     return a.likes - b.likes;
-    // });
+    // }); // sort by likes count
 
     var messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
@@ -146,10 +190,13 @@ function loadPostsFromLocalStorage() {
             </div>
 
             <div class="comments">              
-                <button class="collapse-button" onclick="toggleComments(${post.id})"><b>Комментарии</b>  ${comments.length}</button>
+                <button class="collapse-button" onclick="toggleComments(${post.id})">
+                    <b>Комментарии</b>  ${comments.length} 
+                </button>
                 <div class="comment-list" id="comments-${post.id}">
-                    <!-- здесь будут комментарии -->
-
+                    <div class="comment-container">
+                        <!-- здесь будут комментарии -->
+                    </div>
                     <div class="add-comment">
                         <input type="text-comment" id="comment-input-${post.id}" placeholder="комментарий">
                         
@@ -174,6 +221,12 @@ function loadPostsFromLocalStorage() {
     });
 }
 
+function scrollToBottom(postId) {
+    var commentsDiv = document.getElementById(`comments-${postId}`);
+    commentsDiv.scrollTop = commentsDiv.scrollHeight;
+}
+
+
 function clearComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
     commentsDiv.innerHTML = '';
@@ -186,22 +239,22 @@ function clearComments(postId) {
 
 function toggleComments(postId) {
     var commentsDiv = document.getElementById(`comments-${postId}`);
+    var commentContainer = document.getElementById(`comment-container-${postId}`);
     
-    var commentListContent = document.getElementById(`comment-list-content-${postId}`);
-      
-    if (!commentListContent) {
-        commentListContent = document.createElement('div');
-        commentListContent.setAttribute('id', `comment-list-content-${postId}`);
-        commentsDiv.appendChild(commentListContent);
+    if (!commentContainer) {
+        commentContainer = document.createElement('div');
+        commentContainer.setAttribute('id', `comment-container-${postId}`);
+        commentsDiv.appendChild(commentContainer);
     }
 
     if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
-        commentListContent.innerHTML = '';
-        loadCommentsFromLocalStorage(postId, commentListContent);
+        commentContainer.innerHTML = '';
+        loadCommentsFromLocalStorage(postId, commentContainer);
     } else {
         commentsDiv.style.display = 'none';       
     } 
 }
+
 
 function isCommentValid(comment) {
     var banWords = ["бля", "хуй", "сук", "еба", "ебу", "пизд"];
@@ -219,12 +272,27 @@ function addComment(postId) {
     var commentInput = document.getElementById(`comment-input-${postId}`);
     var commentText = commentInput.value.trim();
     if (!commentText) {
-        alert('Пожалуйста, введите комментарий.');
+        alert('введите коммент');
         return;
     }
 
     if (!isCommentValid(commentText)) {
         alert('пошел нахуй уебан');
+        return;
+    }
+
+    if (commentText.length > 200) {
+        alert('коммент слишком длинный, максимальная длина - 200 символов');
+        return;
+    }
+
+    var words = commentText.split(' ');
+    var isInvalidWordLength = words.some(function(word) {
+        return word.length > 18;
+    });
+
+    if (isInvalidWordLength) {
+        alert('какое-то слово в комменте длинне 18 символов');
         return;
     }
 
@@ -350,7 +418,8 @@ function loadCommentsFromLocalStorage(postId) {
             </button>
         </div>
     `;
-    commentsDiv.insertAdjacentHTML('beforeend', addCommentHTML);
+
+    commentsDiv.insertAdjacentHTML('afterbegin', addCommentHTML);
 
     commentsDiv.style.display = 'block';
 }
