@@ -30,6 +30,373 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//node "C:\Users\Зимин Михаил\OneDrive\Рабочий стол\hello world\capybaraWebsite\server.js"
+
+// {  
+//   const TelegramBot = require('node-telegram-bot-api');
+//   const WebSocket = require('ws');
+//   const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo';
+
+//   const express = require('express');
+//   const mongoose = require('mongoose');
+//   const bodyParser = require('body-parser');
+//   const cors = require('cors');
+  
+//   const { MongoClient } = require('mongodb');
+
+//   const bot = new TelegramBot(token, { polling: true });
+//   const wss = new WebSocket.Server({ port: 8080 });
+
+//   const app = express();
+//   const port = process.env.PORT || 3000;
+
+//   app.use(bodyParser.json());
+//   app.use(cors());
+  
+//   // Подключение к MongoDB
+//   mongoose.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+//   });
+
+//   // // Подключение к MongoDB
+//   // mongoose.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', {
+//   //   useNewUrlParser: true,
+//   //   useUnifiedTopology: true
+//   // });
+
+  
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'Ошибка подключения к MongoDB:'));
+// db.once('open', () => {
+//   console.log('Успешное подключение к MongoDB');
+// });
+  
+
+
+// // Определение схемы и модели данных
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+//   likes: Number,
+//   timestamp: Number
+// });
+
+
+
+// const Post = mongoose.model('Post', postSchema);
+
+// // Маршруты
+// app.get('/posts', async (req, res) => {
+//   try {
+//     const agg = []; // Ваши этапы агрегации
+//     const client = await MongoClient.connect(
+//       'mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/',
+//       { useNewUrlParser: true, useUnifiedTopology: true }
+//     );
+//     const coll = client.db('test').collection('posts');
+//     const cursor = coll.aggregate(agg);
+//     const result = await cursor.toArray();
+//     await client.close();
+
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Ошибка при получении постов' });
+//   }
+// });
+
+// // Маршрут для получения постов
+// app.get('/posts', async (req, res) => {
+//   try {
+//     const posts = await Post.find({}, { __v: 0 }); // Исключаем поле __v
+//     res.status(200).json(posts);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Ошибка при получении постов' });
+//   }
+// });
+
+// // Запуск сервера
+// app.listen(port, () => {
+//   console.log(`Сервер запущен на порту ${port}`);
+// });
+
+// wss.on('connection', (ws) => {
+//   console.log('Установлено новое WebSocket соединение');
+//   ws.on('message', (message) => {
+//     console.log('Получено сообщение из WebSocket:', message);
+//   });
+// });
+
+// bot.on('message', (msg) => {
+//   const messageData = msg;
+//   console.log('Получено сообщение:', messageData);
+
+//   saveMessageToMongoDB(messageData);
+
+
+//   // Отправляем сообщение через WebSocket
+//   wss.clients.forEach((client) => {
+//     client.send(JSON.stringify(messageData));
+//   });
+
+//   bot.sendMessage(chat.id, 'Получено');
+// });
+    
+// async function saveMessageToMongoDB(messageData) {
+//     try {
+//       const { chat, text, from, date, reply_to_message } = messageData;
+//       const { id, first_name, last_name, username } = from;
+//       const { id: chatId, type } = chat;
+  
+//       let name, url, messageText;
+  
+//       if (reply_to_message) {
+//         // Если есть пересланное сообщение, извлекаем данные из него
+//         const { text: replyText } = reply_to_message;
+//         const regex = /([^]+) \n([^ \n]+) \n([^]+)/;
+//         [, name, url, messageText] = replyText.match(regex);
+//       } else {
+//         // Если пересланного сообщения нет, используем данные текущего сообщения
+//         const regex = /([^]+) \n([^ \n]+) \n([^]+)/;
+//         [, name, url, messageText] = text.match(regex);
+//       }
+  
+//       const post = new Post({
+//         name: name || (username ? `@${username}` : `${first_name} ${last_name}`),
+//         url: url || `https://t.me/${type === 'private' ? 'c' : 's'}/${chatId}/${messageData.message_id}`,
+//         messageText: messageText || text,
+//         likes: 0,
+//         timestamp: date,
+//       });
+  
+//       await post.save({ wtimeout: 0 });
+//       console.log('Сообщение успешно сохранено в базу данных.');
+//     } catch (error) {
+//       console.error('Ошибка при сохранении сообщения:', error);
+//     }
+
+//   }
+// }
+
+
+// {
+// const TelegramBot = require('node-telegram-bot-api');
+// const WebSocket = require('ws');
+// const token = '6392841364:AAE8PozN2Y6x0zbyjO8ei6KIRm-hUDcGyUo'; // Замените на свой токен
+
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const bodyParser = require('body-parser');
+// const cors = require('cors');
+
+// const { MongoClient } = require('mongodb');
+
+// const bot = new TelegramBot(token, { polling: true });
+// const wss = new WebSocket.Server({ port: 8080 });
+
+// const app = express();
+// const port = process.env.PORT || 5500;
+
+// wss.on('connection', (ws) => {
+//   console.log('Установлено новое WebSocket соединение');
+//   ws.on('message', (message) => {
+//     console.log('Получено сообщение из WebSocket:', message);
+//   });
+// });
+
+
+// app.use(express.static(__dirname + '/capybaraWebsite'));
+
+// app.use(bodyParser.json());
+// app.use(cors());
+
+// // Подключение к MongoDB
+// mongoose.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// });
+
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'Ошибка подключения к MongoDB:'));
+// db.once('open', () => {
+//   console.log('Успешное подключение к MongoDB');
+// });
+
+// // Определение схемы и модели данных
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+//   likes: Number,
+//   timestamp: Number
+// });
+
+// const Post = mongoose.model('Post', postSchema);
+
+// // Маршрут для получения постов из MongoDB
+// app.get('http://127.0.0.1:5500/posts', async (req, res) => {
+//   try {
+//     const agg = []; // Ваши этапы агрегации
+//     const client = await MongoClient.connect('mongodb+srv://mishaDataBase:ptNJzhp7QlM5xBiH@cluster0.0frsvu2.mongodb.net/', {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true
+//     });
+//     const coll = client.db('test').collection('posts');
+//     const cursor = coll.aggregate(agg);
+//     const result = await cursor.toArray();
+//     await client.close();
+
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Ошибка при получении постов' });
+//   }
+// });
+
+// // Маршрут для сохранения сообщения в MongoDB
+// bot.on('message', (msg) => {
+//   const messageData = msg;
+//   console.log('Получено сообщение:', messageData);
+
+//   saveMessageToMongoDB(messageData);
+
+//   wss.clients.forEach((client) => {
+//     client.send(JSON.stringify(messageData));
+//   });
+
+//   bot.sendMessage(msg.chat.id, 'Получено');
+// });
+
+// async function saveMessageToMongoDB(messageData) {
+//   try {
+//     // Ваш код для извлечения данных из сообщения
+
+//     const post = new Post({
+//       name: 'Example Name',
+//       url: 'https://example.com',
+//       messageText: 'Example Message',
+//       likes: 0,
+//       timestamp: Date.now()
+//     });
+
+//     await post.save({ wtimeout: 0 });
+//     console.log('Сообщение успешно сохранено в базе данных.');
+//   } catch (error) {
+//     console.error('Ошибка при сохранении сообщения:', error);
+//   }
+// }
+
+// // Запуск сервера
+// app.listen(port, () => {
+//   console.log(`Сервер запущен на порту ${port}`);
+// });
+
+// wss.on('connection', (ws) => {
+//   console.log('Установлено новое WebSocket соединение');
+//   ws.on('message', (message) => {
+//     console.log('Получено сообщение из WebSocket:', message);
+//   });
+// });
+// }
+
+
+
+
+
+
+// {
+//   const express = require('express');
+// const mongoose = require('mongoose');
+// const bodyParser = require('body-parser');
+// const cors = require('cors');
+
+// const app = express();
+// const port = process.env.PORT || 3000;
+
+// app.use(bodyParser.json());
+// app.use(cors());
+
+// // Подключение к MongoDB
+// mongoose.connect('mongodb://localhost:27017/mydatabase', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// });
+
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'Ошибка подключения к MongoDB:'));
+// db.once('open', () => {
+//   console.log('Успешное подключение к MongoDB');
+// });
+
+// // Определение схемы и модели данных
+// const postSchema = new mongoose.Schema({
+//   name: String,
+//   url: String,
+//   messageText: String,
+//   likes: Number,
+//   timestamp: Number
+// });
+
+// const Post = mongoose.model('Post', postSchema);
+
+// // Маршруты
+// app.post('http://localhost:5500/capybaraWebsite/api/posts', async (req, res) => {
+//   const { name, url, messageText, timestamp } = req.body;
+
+//   const newPost = new Post({
+//     name,
+//     url,
+//     messageText,
+//     likes: 0,
+//     timestamp
+//   });
+
+//   try {
+//     await newPost.save();
+//     res.status(201).json({ message: 'Пост успешно сохранен' });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Ошибка при сохранении поста' });
+//   }
+// });
+
+// // Запуск сервера
+// app.listen(port, () => {
+//   console.log(`Сервер запущен на порту ${port}`);
+// });
+
+// }
+
+
+
+
+
+
+
+
 // const TelegramBot = require('node-telegram-bot-api');
 // const WebSocket = require('ws');
 // const http = require('http');
@@ -124,7 +491,7 @@
 //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
 //   // Обрабатываем запросы здесь
-//   if (req.method === 'GET' && req.url === '/api/posts') {
+//   if (req.method === 'GET' && req.url === 'http://localhost:5500/capybaraWebsite/api/posts') {
 //     // Возвращаем список постов из MongoDB при запросе /api/posts
 //     Post.find()
 //       .then((posts) => {
